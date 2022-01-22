@@ -1,7 +1,8 @@
 from discord.ext import commands
 import datetime
 import sys
-
+import pickle
+import os
 
 class GuildData:
     def __init__(self, guild):
@@ -10,6 +11,14 @@ class GuildData:
         self.exp_total = {}
         self.calling_duration_current = {}
         self.calling_duration_total = {}
+        self.exp_filepath = os.path.join(os.getcwd(), guild.name + "exp.pkl")
+        self.duration_filepath = os.path.join(os.getcwd(), guild.name + "duration.pkl")
+        if(os.path.isfile(self.exp_filepath)):
+            with open(self.exp_filepath, "rb") as tf:
+                self.exp_total = pickle.load(tf)
+        if(os.path.isfile(self.duration_filepath)):
+            with open(self.duration_filepath, "rb") as tf:
+                self.calling_duration_total = pickle.load(tf)
 
     def update_call_duration_current(self, member_name, point):
         if(member_name not in self.calling_duration_current.keys()):
@@ -51,7 +60,14 @@ class GuildData:
             text_log += str(exp_current//60) + "の経験値を得た"
         else:
             text_log = None
+            self.save()
         return text_log
+
+    def save(self):
+        with open(self.exp_filepath, "wb") as tf:
+            pickle.dump(self.exp_total,tf)
+        with open(self.duration_filepath, "wb") as tf:
+            pickle.dump(self.calling_duration_total,tf)
 
 class Piro3112Bot(commands.Bot):
 
