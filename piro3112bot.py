@@ -1,6 +1,5 @@
 from discord.ext import commands
 import datetime
-import sys
 import pickle
 import os
 
@@ -55,8 +54,12 @@ class GuildData:
         print(calling_duration_current_total)
 
         if (calling_duration_current_total > 300):
-            text_log = member_name + "は" + str(int(calling_duration_current_total // 3600)) + "時間"
-            text_log += str(int(calling_duration_current_total % 3600 // 60)) + "分" + str(int(calling_duration_current_total % 60)) + "秒の通話を終え"
+            text_log = member_name + "は" 
+            if(int(calling_duration_current_total // 3600) != 0):
+                text_log += str(int(calling_duration_current_total // 3600)) + "時間"
+            if(int(calling_duration_current_total % 3600 // 60)):
+                text_log += str(int(calling_duration_current_total % 3600 // 60)) + "分" 
+            text_log += str(int(calling_duration_current_total % 60)) + "秒の通話を終え"
             text_log += str(exp_current//60) + "の経験値を得た"
         else:
             text_log = None
@@ -78,6 +81,8 @@ class Piro3112Bot(commands.Bot):
             self.guild_data[guild.name] = GuildData(guild)
 
     async def on_voice_state_update(self, member, before, after):
+        if (member.bot):
+            return
         point = 3
         if(after.deaf or after.self_deaf):
             point -= 3
@@ -93,5 +98,4 @@ class Piro3112Bot(commands.Bot):
         if(text_log != None):
             await member.guild.text_channels[0].send(text_log)
 
-client = Piro3112Bot(command_prefix="$")
-client.run(sys.argv[1])
+bot = Piro3112Bot(command_prefix="$")
